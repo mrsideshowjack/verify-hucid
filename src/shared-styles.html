@@ -15,26 +15,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <style>
       :root{
-      --app-primary-color: hsla(205%, 20%, 18%, 1); 
-      --app-secondary-color: hsla(199%, 74%, 27%, 1);
-      --app-tertiary-color: hsla(199%, 57%, 82%, 1); 
-      --app-grey-color: hsla(150%,6%, 93%, 1); 
-      --app-accent-color: hsla(27%, 100%, 50%, 1);
+      --app-primary-color: rgba(37, 48, 56, 1); 
+      --app-secondary-color: rgba(18, 88, 120, 1);
+      --app-tertiary-color: rgba(182, 218, 235, 1); 
+      --app-grey-color: rgba(236, 238, 237, 1); 
+      --app-accent-color: rgba(255, 115, 0, 1);
+
       --primary-color: var(--app-primary-color);
       --secondary-color: var(--app-secondary-color);
+
+      --paper-tabs-selection-bar-color: var(--app-accent-color);
+      --paper-tab-ink: var(--app-accent-color);
       }
       body{
         background-color: var(--app-grey-color);
       }
       .card {
-        margin: 24px;
+        margin: 24px auto;
         padding: 16px;
         color: #757575;
         border-radius: 5px;
         background-color: #fff;
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        max-width: 1000px;
       }
-
+      
       .circle {
         display: inline-block;
         width: 64px;

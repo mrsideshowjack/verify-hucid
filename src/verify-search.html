@@ -1,0 +1,100 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../bower_components/paper-search/paper-search-bar.html">
+
+<link rel="import" href="./shared-styles.html">
+
+<dom-module id="verify-search">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--app-primary-color);
+        width: 100%;
+        height: calc(100vh - 112px);
+      }
+      @media screen 
+        and (max-width: 600px) {
+          :host{
+            height: calc(100vh - 64px);
+          }
+      }
+      :host:before{
+        content: "";
+        display: block;
+        position: fixed;
+        width: 900px;
+        height: 900px;
+        bottom: -400px;
+        left: -400px;
+        border: 80px solid rgba(255, 115, 0, 0.13);
+        border-radius: 50%;
+      }
+      :host:after{
+        content: "";
+        display: block;
+        position: fixed;
+        width: 1400px;
+        height: 1400px;
+        bottom: -700px;
+        left: -500px;
+        border: 80px solid rgba(255, 115, 0, 0.13);
+        border-radius: 50%;
+      }
+      .search {
+        width: 500px;
+        z-index: 1;
+      }
+
+      .search h1 {
+        color: var(--app-grey-color);
+        font-size: 2rem;
+      }
+    </style>
+    <div class="search">
+      <h1>Check your fact</h1>
+      <paper-search-bar query="{{query}}" on-paper-search-search="_search"></paper-search-bar>
+
+    </div>
+  </template>
+
+  <script>
+    class VerifySearch extends Polymer.Element {
+      static get is() {
+        return 'verify-search';
+      }
+      static get properties() {
+        return {
+          query: {
+            type: String,
+            notify: true,
+            reflectToAttribute: true
+          },
+          page: {
+            type: String,
+            notify: true,
+            reflectToAttribute: true
+          }
+        };
+      }
+      _search(){
+        this.page = 'results';
+        console.log('cum')
+      }
+    }
+
+    window.customElements.define(VerifySearch.is, VerifySearch);
+  </script>
+</dom-module>
