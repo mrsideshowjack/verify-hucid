@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="verify-profile">
@@ -22,16 +23,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="card">
-      <div class="circle">3</div>
-      <h1>View Three</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
+      <iron-image class="avatar" sizing="cover" preload fade src="[[user.photoURL]]" placeholder="https://avatars.io/static/default_128.jpg"></iron-image>
+      <h1>{{user.displayName}}</h1>
+      <p>{{user.displayName}}</p>
+      <p>{{user.email}}</p>
     </div>
   </template>
 
   <script>
     class VerifyProfile extends Polymer.Element {
       static get is() { return 'verify-profile'; }
+      static get properties() {
+        return {
+          isSignedIn: {
+            type: Boolean,
+            notify: true,
+            value: false
+          },
+          user: {
+            type: Object,
+            notify: true
+          }
+        };
+      }
     }
 
     window.customElements.define(VerifyProfile.is, VerifyProfile);

@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="verify-icons.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="verify-results">
@@ -27,7 +28,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         flex-direction: column;
       }
     </style>
-
+    
+    <paper-icon-button icon="verify-icons:arrow-back" on-tap="back"></paper-icon-button>
+    
     <div class="card">
       <div class="circle">65%</div>
       <h1>[[query]]</h1>
@@ -56,8 +59,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             notify: true,
             reflectToAttribute: true
+          },
+          page: {
+            type: String,
+            notify: true,
+            reflectToAttribute: true
           }
         };
+      }
+      back(){
+        this.page = 'search';
       }
     }
 

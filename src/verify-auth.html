@@ -1,0 +1,352 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth-script.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="verify-icons.html">
+
+<dom-module id="verify-auth">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px;
+        color: #fff;
+      }
+      #displayName{
+        color: #fff;
+        margin-right: 5px;
+      }
+      #authDialog{
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        top: 50px;
+        right: 1em;
+        padding: 0px;
+        margin-bottom: 1em;
+        overflow-y: auto;
+        border-top: 5px solid var(--app-primary-color);
+      }
+      #triangle{
+        position: fixed;
+        width: 0;
+        height: 0;
+        padding: 0px;
+        margin: 0px;
+        top: 65px;
+        right: 54px;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid var(--app-primary-color);
+      }
+      #authDialog .avatar{
+        width:100px;
+        height:100px;
+        padding: 0px;
+        border-radius: 50%;
+        border: 2px solid var(--app-primary-color);
+        background-color: lightgray;
+      }
+      #authDialog .highlight{
+          margin-top: 1.5em;
+      }
+      #thirdPartyLogins{
+        width: 100%;
+        padding: 1em 0px;
+        background-color: lightgray;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      paper-tabs{
+        margin-top: 0px;
+      }
+      iron-form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      paper-icon-button{
+        color: #fff;
+        width: 50px;
+        height: 50px;
+      }
+      paper-button iron-icon,
+      paper-input iron-icon{
+        margin-right: 5px;
+        color: #212121;
+      }
+      .link{
+        color: var(--app-primary-color);
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .link:hover{
+        text-decoration: underline;
+      }
+    </style>
+    <firebase-auth 
+      id="auth"
+      app-name="verify-hucid"
+      user="{{user}}"
+      signed-in={{isSignedIn}}>
+    </firebase-auth>
+
+    <template is="dom-if" if="{{isSignedIn}}">
+      <p id="displayName">{{user.displayName}}</p>
+      <paper-icon-button on-tap="_openAuthDialog" src="[[user.photoURL]]"></paper-icon-button>
+    </template>
+    <template is="dom-if" if="{{!isSignedIn}}">
+      <paper-icon-button on-tap="_openAuthDialog" icon="verify-icons:account-circle"></paper-icon-button>
+    </template>
+
+
+    <!-- Auth dialog -->
+    <paper-dialog id="authDialog" always-on-top>
+      <span id="triangle"></span>
+      <template is="dom-if" if="{{!isSignedIn}}">
+        <!-- pages for create, login and reset? -->
+        <paper-tabs selected="{{loginPage}}">
+            <paper-tab>Login</paper-tab>
+            <paper-tab>Signup</paper-tab>
+        </paper-tabs>
+        <iron-pages id="authPages" selected="{{loginPage}}">
+          <!-- login page -->
+          <iron-form id="loginForm" on-iron-form-presubmit="_onLoginIronFormPresubmit">
+            <form>
+              <paper-input 
+                required
+                name="email"
+                label="email" 
+                autocomplete="email"
+                pattern="[^@\s]+@[^@\s]+\.[^@\s]+" 
+                type="email"
+                error-message="Invalid email address.">
+                <iron-icon icon="verify-icons:email" slot="prefix"></iron-icon>
+              </paper-input>
+              <paper-input 
+                required
+                name="password"
+                label="password" 
+                type="password"
+                autocomplete="password"
+                error-message="Invalid password.">
+                <iron-icon icon="verify-icons:lock" slot="prefix"></iron-icon>
+              </paper-input>
+            </form>
+            <a class="link" on-tap="_toForgotPassPage">Forgot password?</a>
+            <paper-button class="highlight" on-tap="_submitForm">login</paper-button>
+          </iron-form>
+          <!-- signup page -->
+          <iron-form id="signupForm" on-iron-form-presubmit="_onSignupIronFormPresubmit">
+            <form>
+              <paper-input 
+                required
+                name="email"
+                label="email" 
+                autocomplete="email"
+                pattern="[^@\s]+@[^@\s]+\.[^@\s]+" 
+                type="email"
+                error-message="Invalid email address.">
+                <iron-icon icon="verify-icons:email" slot="prefix"></iron-icon>
+              </paper-input>
+              <paper-input 
+                required
+                name="password"
+                label="password" 
+                type="password"
+                autocomplete="password"
+                error-message="Invalid password.">
+                <iron-icon icon="verify-icons:lock" slot="prefix"></iron-icon>
+              </paper-input>
+            </form>
+            <paper-button class="highlight" on-tap="_submitForm">Signup</paper-button>
+          </iron-form>
+          <!-- forgot pass page -->
+          <iron-form id="forgotPassForm" on-iron-form-presubmit="_onForgotPassIronFormPresubmit">
+            <form>
+              <paper-input required name="email" label="email" autocomplete="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" type="email" error-message="Invalid email address.">
+                <iron-icon icon="verify-icons:email" slot="prefix"></iron-icon>
+              </paper-input>
+            </form>
+            <paper-button class="highlight" on-tap="_submitForm">Signup</paper-button>
+          </iron-form>
+        </iron-pages>
+        <div id="thirdPartyLogins">
+          <paper-button on-tap="authLoginPopup" data-provider="google">
+            <iron-icon icon="verify-icons:google"></iron-icon>login with Google</paper-button>
+          <!-- <paper-button on-tap="authLoginPopup" data-provider="github">
+            <iron-icon icon="verify-icons:github"></iron-icon>login with Github</paper-button>
+          <paper-button on-tap="authLoginPopup" data-provider="twitter">
+            <iron-icon icon="verify-icons:twitter"></iron-icon>login with Twitter</paper-button> -->
+        </div>
+        <div class="buttons">
+          <paper-button dialog-dismiss>Cancel</paper-button>
+        </div>
+      </template>
+
+      <template is="dom-if" if="{{isSignedIn}}">
+        <iron-image
+          class="avatar"
+          sizing="cover" 
+          preload fade 
+          src="[[user.photoURL]]"
+          placeholder="https://avatars.io/static/default_128.jpg"></iron-image>
+        <p>{{user.displayName}}</p>
+        <p>{{user.email}}</p>
+        <paper-button class="highlight" on-tap="_pageProfile">View Profile</paper-button>
+        <div class="buttons">
+          <paper-button on-tap="authLogout">logout</paper-button>
+          <paper-button dialog-dismiss>Cancel</paper-button>
+        </div>
+      </template>
+
+    </paper-dialog>
+
+  </template>
+
+  <script>
+    class VerifyAuth extends Polymer.Element {
+      static get is() { return 'verify-auth'; }
+      static get properties() {
+        return {
+          isSignedIn: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true,
+            value: false
+          },
+          user: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true
+          },
+          loginPage: {
+            tpye: Number,
+            notify: true,
+            value: 0
+          }
+        };
+      }
+      ready() {
+        super.ready();
+      }
+      _toForgotPassPage(e){
+        this.$$('#authPages').selected = 2;
+      }
+      _pageProfile(e){
+        this.$.authDialog.close();
+        this.dispatchEvent(new CustomEvent('pageChange', {bubbles: true, composed: true, detail: {page: "profile"}}));
+      }
+      _openAuthDialog(e){
+        this.$.authDialog.open();
+      }
+      _submitForm(e){
+        e.target.parentElement.submit();
+      }
+     _onLoginIronFormPresubmit(e) {
+      e.preventDefault();
+      this.authLoginWithEmailAndPassword(e.target.serializeForm());
+      }
+      _onSignupIronFormPresubmit(e) {
+      e.preventDefault();
+      this.authSignupWithEmailAndPassword(e.target.serializeForm());
+      }
+      _onForgotPassIronFormPresubmit(e) {
+        e.preventDefault();
+        this.authSendPasswordResetEmail(e.target.serializeForm());
+      }
+      authSendPasswordResetEmail(formdata) {
+        var a = this;
+        this.$.auth.sendPasswordResetEmail(formdata.email)
+          .then(function (response) {
+            // successful authentication
+            console.log(response);
+            a.dispatchEvent(new CustomEvent('eventToastCall', { bubbles: true, composed: true, detail: { text: "Password reset email sent" } }));
+          })
+          .catch(function (error) {
+            // unsuccessful authentication
+            console.log(error);
+            //toast call
+            a.dispatchEvent(new CustomEvent('eventErrToastCall', { bubbles: true, composed: true, detail: { text: error.message } }));
+          });
+      }
+      authLoginWithEmailAndPassword(formdata){
+        var a = this;
+        this.$.auth.signInWithEmailAndPassword(formdata.email, formdata.password)
+          .then(function(response) {
+            // successful authentication
+            console.log(response);
+            a.dispatchEvent(new CustomEvent('eventToastCall', {bubbles: true, composed: true, detail: {text: "Welcome " + response.user.displayName}}));
+          })
+          .catch(function(error) {
+            // unsuccessful authentication
+            console.log(error);
+            //toast call
+            a.dispatchEvent(new CustomEvent('eventErrToastCall', {bubbles: true, composed: true, detail: {text: error.message}}));
+          });
+      }
+      authSignupWithEmailAndPassword(formdata){
+        var a = this;
+        this.$.auth.createUserWithEmailAndPassword(formdata.email, formdata.password)
+          .then(function(response) {
+            // successful authentication
+            console.log(response);
+            a.dispatchEvent(new CustomEvent('eventToastCall', {bubbles: true, composed: true, detail: {text: "Welcome " + response.user.displayName}}));
+          })
+          .catch(function(error) {
+            // unsuccessful authentication
+            console.log(error);
+            //toast call
+            a.dispatchEvent(new CustomEvent('eventErrToastCall', {bubbles: true, composed: true, detail: {text: error.message}}));
+          });
+      }
+      authLoginPopup(e){
+        var a = this;
+        this.$.auth.signInWithPopup(e.target.dataset.provider)
+          .then(function(response) {
+            // successful authentication
+            console.log(response);
+            //toast call
+            a.dispatchEvent(new CustomEvent('eventToastCall', {bubbles: true, composed: true, detail: {text: "Welcome " + response.user.displayName}}));
+          })
+          .catch(function(error) {
+            // unsuccessful authentication
+            console.log(error);
+            //toast call
+            a.dispatchEvent(new CustomEvent('eventErrToastCall', {bubbles: true, composed: true, detail: {text: error.message}}));
+          });
+      }
+      authLogout(e){
+        var a = this;
+        this.$.auth.signOut()
+          .then(function(response) {
+            // successful authentication
+            console.log(response);
+            a.dispatchEvent(new CustomEvent('eventToastCall', {bubbles: true, composed: true, detail: {text: "You have logged out"}}));
+          })
+          .catch(function(error) {
+            // unsuccessful authentication
+            console.log(error);
+            //toast call
+            a.dispatchEvent(new CustomEvent('eventErrToastCall', {bubbles: true, composed: true, detail: {text: error.message}}));
+          });
+      }
+    }
+
+    window.customElements.define(VerifyAuth.is, VerifyAuth);
+  </script>
+</dom-module>

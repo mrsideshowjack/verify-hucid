@@ -21,11 +21,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<!-- firebase -->
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app-script.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth-script.html">
 
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="./shared-styles.html">
 <link rel="import" href="./verify-icons.html">
+<link rel="import" href="./verify-auth.html">
 
 <link rel="lazy-import" href="verify-search.html">
 <link rel="lazy-import" href="verify-results.html">
@@ -81,6 +88,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
+    <firebase-app
+      name="verify-hucid"
+      auth-domain="verify-hucid.firebaseapp.com"
+      database-url="https://verify-hucid.firebaseio.com"
+      api-key="AIzaSyDGLIvIqokF7V1KQEyI-KxikXRT4z7kN1M"
+      storage-bucket="verify-hucid.appspot.com"
+      messaging-sender-id="936613986333"
+      project-id="verify-hucid">
+    </firebase-app>
+
     <app-location route="{{route}}" url-space-regex="^[[rootPath]]">
     </app-location>
 
@@ -128,6 +145,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </g>
             </svg>
             <div main-title>Veri.fy</div>
+            <verify-auth isSignedIn="{{isSignedIn}}" user="{{user}}"></verify-auth>
           </app-toolbar>
           <template is="dom-if" if="{{wide}}">
             <paper-tabs selected="{{page}}" attr-for-selected="name" scrollable>
@@ -139,8 +157,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
           <verify-search name="search" page={{page}} query="{{query}}"></verify-search>
-          <verify-results name="results" query="{{query}}"></verify-results>
-          <verify-profile name="profile"></verify-profile>
+          <verify-results name="results" page={{page}} query="{{query}}"></verify-results>
+          <verify-profile name="profile" isSignedIn="{{isSignedIn}}" user="{{user}}"></verify-profile>
           <verify-view404 name="view404"></verify-view404>
         </iron-pages>
       </app-header-layout>
@@ -165,6 +183,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String,
+          isSignedIn: {
+            type: Boolean,
+            notify: true,
+            value: false
+          },
+          user: {
+            type: Object,
+            notify: true
+          },
         };
       }
 
