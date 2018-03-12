@@ -105,13 +105,13 @@
       signed-in={{isSignedIn}}>
     </firebase-auth>
 
-    <template is="dom-if" if="{{isSignedIn}}">
+    <!-- <template is="dom-if" if="{{isSignedIn}}">
       <p id="displayName">{{user.displayName}}</p>
       <paper-icon-button on-tap="_openAuthDialog" src="[[user.photoURL]]"></paper-icon-button>
-    </template>
-    <template is="dom-if" if="{{!isSignedIn}}">
+    </template> -->
+    <!-- <template is="dom-if" if="{{!isSignedIn}}"> -->
       <paper-icon-button on-tap="_openAuthDialog" icon="verify-icons:account-circle"></paper-icon-button>
-    </template>
+    <!-- </template> -->
 
 
     <!-- Auth dialog -->
@@ -153,6 +153,12 @@
           <!-- signup page -->
           <iron-form id="signupForm" on-iron-form-presubmit="_onSignupIronFormPresubmit">
             <form>
+              <paper-input 
+                required
+                name="name"
+                label="name" 
+                autocomplete="name">
+              </paper-input>
               <paper-input 
                 required
                 name="email"
@@ -304,6 +310,7 @@
         this.$.auth.createUserWithEmailAndPassword(formdata.email, formdata.password)
           .then(function(response) {
             // successful authentication
+            
             console.log(response);
             a.dispatchEvent(new CustomEvent('eventToastCall', {bubbles: true, composed: true, detail: {text: "Welcome " + response.user.displayName}}));
           })
@@ -312,6 +319,16 @@
             console.log(error);
             //toast call
             a.dispatchEvent(new CustomEvent('eventErrToastCall', {bubbles: true, composed: true, detail: {text: error.message}}));
+          });
+          console.log(this.user);
+          
+          this.user.updateProfile({
+            displayName: formdata.name,
+            photoURL: "https://example.com/jane-q-user/profile.jpg"
+          }).then(function () {
+            // Profile updated successfully
+          }, function (error) {
+            // An error happened.
           });
       }
       authLoginPopup(e){

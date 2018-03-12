@@ -9,6 +9,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+
 <link rel="import" href="verify-icons.html">
 <link rel="import" href="shared-styles.html">
 
@@ -32,10 +34,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-icon-button icon="verify-icons:arrow-back" on-tap="back"></paper-icon-button>
     
     <div class="card">
-      <div class="circle">65%</div>
+      <div class="circle">[[score]]%</div>
       <h1>[[query]]</h1>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>
-      <p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>
+      <paper-progress value="[[score]]"></paper-progress>
+      <p>[[scoreTxt.title]]</p>
+      <p>[[scoreTxt.para]]</p>
     </div>
     <div class="card">
       <h2>Fact Sources</h2>
@@ -64,8 +67,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             notify: true,
             reflectToAttribute: true
-          }
+          },
+          score:{
+            type: Number,
+            notify: true,
+            computed: 'getNewScore()'
+          },
+          scoreTxt: {
+            type: Object,
+            notify: true,
+            computed: '_getScoreTxt(score)'
+          },
         };
+      }
+      getNewScore(){
+        return Math.floor((Math.random() * 100) + 1);
+      }
+      _getScoreTxt(score) {
+        let low = {
+          title: 'low',
+          para: 'Don\'t trust this fact.'
+        };
+        let med = {
+          title: 'med',
+          para: 'This fact is 50\/50'
+        };
+        let high = {
+          title: 'high',
+          para: 'Fact very strong'
+        };
+        if (score <= 40) {
+          return low;
+        } else if (score <= 70) {
+          return med;
+        } else {
+          return high;
+        }
       }
       back(){
         this.page = 'search';
